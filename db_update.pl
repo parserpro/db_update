@@ -13,15 +13,16 @@ our $dbh;
 
 get_db();
 
-plan tests => 6;
+plan tests => 8;
 
 is(table('test')->exists, 0, 'Not exists');
 is(table('test1')->exists, 1, 'Exists' );
 is(table('test1')->has_column('fake'), 0, 'Not existent column');
 is(table('test1')->has_column('name'), 1, 'Existent column');
+is(table('test1')->column('name')->{def}->{field}, 'name', 'Existent column 2');
 is(table('test1')->column('name')->has_type('int'), 0, 'Wrong type of column');
 is(table('test1')->column('name')->has_type('varchar(45)'), 1, 'Right type of column');
-
+is(table('test1')->column('name')->type, 'varchar(45)', 'Right type of column 2');
 
 
 
