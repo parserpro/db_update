@@ -37,7 +37,13 @@ sub exists {
 sub has_type {
     my ($column, $type) = @_;
 
-    return lc($column->{type}) eq lc($type) ? 1 : 0;
+    return $column->type eq lc($type) ? 1 : 0;
+}
+
+sub type {
+    my $column = shift;
+
+    return lc($column->{def}->{type});
 }
 
 1;
