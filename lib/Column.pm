@@ -1,5 +1,6 @@
 package Column;
 use common::sense;
+use utf8;
 use Data::Dumper;
 
 use Exporter 'import';
@@ -36,7 +37,7 @@ sub exists {
 sub has_type {
     my ($column, $type) = @_;
 
-    return $column
+    return lc($column->{type}) eq lc($type) ? 1 : 0;
 }
 
 1;
