@@ -1,12 +1,12 @@
-package Column;
+package Index;
 use common::sense;
 use utf8;
 use Data::Dumper;
 
 use Exporter 'import';
-our @EXPORT = qw(column);
+our @EXPORT = qw(index);
 
-sub column {
+sub index {
     my $dbh  = $main::dbh;
     my ($table, $name) = @_;
     return unless $table;

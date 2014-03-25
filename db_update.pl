@@ -1,10 +1,9 @@
 #!/usr/bin/env perl
 use 5.10.0;
 use common::sense;
+use utf8;
 
 use DBI;
-use Test::More;
-use Data::Dumper;
 
 use lib './lib';
 use Table;
@@ -13,24 +12,19 @@ our $dbh;
 
 get_db();
 
-plan tests => 8;
+unless ( table('test1')->has_column('data') ) {
+    alter('test1', 'SQL here'); # this sub is needed for cache invalidation after schema has been changed
+}
 
-is(table('test')->exists, 0, 'Not exists');
-is(table('test1')->exists, 1, 'Exists' );
-is(table('test1')->has_column('fake'), 0, 'Not existent column');
-is(table('test1')->has_column('name'), 1, 'Existent column');
-is(table('test1')->column('name')->{def}->{field}, 'name', 'Existent column 2');
-is(table('test1')->column('name')->has_type('int'), 0, 'Wrong type of column');
-is(table('test1')->column('name')->has_type('varchar(45)'), 1, 'Right type of column');
-is(table('test1')->column('name')->type, 'varchar(45)', 'Right type of column 2');
+say Dumper([table('test1')->columns]);
 
 
+#=======================================
 
-
-
-
-
-
+sub alter {
+    my ($table, $sql) = @_;
+    delete $Table::cache{$table};
+}
 
 
 
