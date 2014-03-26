@@ -3,6 +3,7 @@ use common::sense;
 use utf8;
 use Data::Dumper;
 
+use base 'Object';
 use Column;
 use Index;
 
@@ -12,33 +13,7 @@ our @EXPORT = qw(table);
 our %cache;
 
 sub table {
-    my $dbh  = $main::dbh;
-    my $name = shift;
-    return unless $name;
-    return $cache{$name} if exists $cache{$name};
-
-    my $res;
-
-    eval {
-        $res  = $dbh->selectall_arrayref("DESCRIBE `$name`", {Slice => {}});
-    };
-
-#warn Dumper($res);
-
-    my $table = {
-        name => $name,
-        def  => $res,
-    };
-
-    bless $table, __PACKAGE__;
-    $cache{$name} = $table;
-    return $table;
-}
-
-sub exists {
-    my $table = shift;
-    return unless $table;
-    return $table->{def} ? 1 : 0;
+    return __PACKAGE__->SUPER::new(@_);
 }
 
 sub has_column {

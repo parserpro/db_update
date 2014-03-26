@@ -8,22 +8,29 @@ use DBI;
 use lib './lib';
 use Table;
 
-our $dbh;
+our $dbh = get_db();
 
-get_db();
-
-unless ( table('test1')->has_column('data') ) {
-    alter('test1', 'SQL here'); # this sub is needed for cache invalidation after schema has been changed
+if ( table('test1')->has_column('name') ) {
+    say "Column 'name' found!";
+}
+else {
+    say "No column 'name'";
 }
 
-say Dumper([table('test1')->columns]);
 
+if ( table('test1')->has_index('PRIMARY') ) {
+    say "In 1";
+    alter('test1', 'SQL here'); # this sub is needed for cache invalidation after schema has been changed
+}
+else {
+    say "In 2";
+}
 
 #=======================================
 
 sub alter {
     my ($table, $sql) = @_;
-    delete $Table::cache{$table};
+    table($table)->invalidate;
 }
 
 
@@ -65,27 +72,27 @@ sub alter {
 
 
 sub get_db {
-my $server = {
-    base => 'test',
-    host => '127.0.0.1',
-    port => 3311,
-};
+    my $server = {
+        base => 'test',
+        host => '127.0.0.1',
+        port => 3311,
+    };
 
-my %config = (
-    'dsn'        => $ENV{'mysqlconnection'} || qq~dbi:mysql:database=$server->{base};host=$server->{host};port=$server->{port}~,
-    'user'       => $ENV{'mysqluser'}       || 'root',
-    'password'   => $ENV{'mysqlpassword'}   || '',
-);
-my $dsn = "$config{dsn};mysql_connect_timeout=5";
+    my %config = (
+        'dsn'        => $ENV{'mysqlconnection'} || qq~dbi:mysql:database=$server->{base};host=$server->{host};port=$server->{port}~,
+        'user'       => $ENV{'mysqluser'}       || 'root',
+        'password'   => $ENV{'mysqlpassword'}   || '',
+    );
+    my $dsn = "$config{dsn};mysql_connect_timeout=5";
 
-$dbh = DBI->connect(
-    $dsn,
-    $config{user},
-    $config{password},
-    {
-        RaiseError       => 1,
-        PrintError       => 0,
-        FetchHashKeyName => 'NAME_lc',
-    },
-);
+    return DBI->connect(
+        $dsn,
+        $config{user},
+        $config{password},
+        {
+            RaiseError       => 1,
+            PrintError       => 0,
+            FetchHashKeyName => 'NAME_lc',
+        },
+    );
 }
