@@ -7,12 +7,14 @@ use Data::Dumper;
 my %cache;
 
 my %sql = (
+    Schema => sub {},
     Table  => sub { 'DESCRIBE `' . $_[0] . '`' },
     Column => sub { 'SHOW FULL COLUMNS FROM `' . $_[0] . '` LIKE ?' },
     Index  => sub { 'SHOW INDEX FROM `' . $_[0] . '` WHERE key_name = ?' },
 );
 
 my %params = (
+    Schema => sub { () },
     Table  => sub { () },
     Column => sub { $_[1] },
     Index  => sub { $_[1] },
@@ -61,9 +63,28 @@ sub invalidate {
     my $class = ref $obj;
     return unless ref $class;
 
-    $class eq 'Table'
-      ? delete $cache{$class}->{$table};
-      : delete $cache{$class}->{$table}->{$name};
+    if ( $class eq 'Table' ) {
+        delete $cache{'Table'}->{$class->{name}};
+        delete $cache{'Column'}->{$class->{name}};
+        delete $cache{'Index'}->{$class->{name}};
+    }
+    else {
+        delete $cache{ref $class}->{$class->{table}}->{$class->{name}};
+    }
 }
+
+sub alter {
+    my ($obj, $sql) = @_;
+
+    if ( $main::show ) {
+        say "SQL: $sql";
+    }
+
+    if ( $main::real ) {
+        $main::dbh->do($sql);
+        $obj->invalidate;
+    }
+}
+
 
 1;

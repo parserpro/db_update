@@ -22,10 +22,4 @@ sub type {
     return lc($column->{def}->[0]->{type});
 }
 
-sub default {
-    my $column = shift;
-    return unless $column;
-    return lc($column->{def}->[0]->{default});
-}
-
 1;
