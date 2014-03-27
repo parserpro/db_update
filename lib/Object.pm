@@ -7,14 +7,14 @@ use Data::Dumper;
 my %cache;
 
 my %sql = (
-    Schema => sub {},
+    Schema => sub { 'SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_name = ?' },
     Table  => sub { 'DESCRIBE `' . $_[0] . '`' },
     Column => sub { 'SHOW FULL COLUMNS FROM `' . $_[0] . '` LIKE ?' },
     Index  => sub { 'SHOW INDEX FROM `' . $_[0] . '` WHERE key_name = ?' },
 );
 
 my %params = (
-    Schema => sub { () },
+    Schema => sub { $_[0] },
     Table  => sub { () },
     Column => sub { $_[1] },
     Index  => sub { $_[1] },

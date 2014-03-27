@@ -8,14 +8,15 @@ use DBI;
 
 use lib './lib';
 use Table;
+use Schema;
 
-my $show = '';
+our $show = '';
 my $host = '127.0.0.1';
 my $base = 'fantlab';
 my $port = '3306';
 my $user = 'root';
 my $pass = '';
-my $real = 0;
+our $real = 0;
 
 GetOptions(
     'show!'    => \$show,
@@ -24,23 +25,21 @@ GetOptions(
     'port|P:s' => \$port,
     'user|u:s' => \$user,
     'password|p:s' => \$pass,
-    'real|r:i' => \$real,
+    'real|r!' => \$real,
 );
 
 our $dbh = get_db();
 
+say 'Working ' . ( $real ? 'IN' : 'NOT' ) . ' real!';
 
+#--------------------------- Put your SQL below this line
+# TODO: implement reading SQL files from the directory
 
-if ( table('test1')->has_column('name') ) {
-    say "Column 'name' found!";
-}
-else {
-    say "No column 'name'";
-}
+say schema('fantlab')->collation;
 
-if ( table('test1')->has_index('PRIMARY') ) {
+unless ( table('test1')->has_index('PRIMARY') ) {
     say "In 1";
-    table('test1')->alter('SQL here'); # this sub is needed for cache invalidation after schema has been changed
+    table('test1')->alter('SQL here');
 }
 else {
     say "In 2";
